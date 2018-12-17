@@ -51,13 +51,13 @@ gulp.task('browser-sync', function() {
 
 gulp.task('sass', function() {
 	return gulp.src('app/scss/style.scss')
+  .pipe(sourcemaps.init())
   .pipe(plumber({
     errorHandler: notify.onError()
   }))
   .pipe(sassGlob())
   .pipe(sass())
   .pipe(gcmq())
-  .pipe(sourcemaps.init())
   .pipe(autoprefixer(['last 2 versions']))
   .pipe(cssunit({
     type     :    'px-to-rem',
