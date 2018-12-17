@@ -9,7 +9,7 @@
 	<meta name="description" content="">
 
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<meta property="og:image" content="path/to/image.jpg">
 	<link rel="shortcut icon" href="img/favicon/favicon.ico" type="image/x-icon">
@@ -24,12 +24,17 @@
 	<!-- iOS Safari -->
 	<meta name="apple-mobile-web-app-status-bar-style" content="#000">
 	
-	<link rel="stylesheet" href="css/style.min.css">
-	<link rel="preload" href="fonts/RobotoBold/RobotoBold.woff" as="font">
-	<link rel="preload" href="fonts/RobotoRegular/RobotoRegular.woff" as="font">
+	<link rel="stylesheet" href="css/style.min.css" type="text/css">
+	<script src="./img/svg.js"></script>
+	<link rel="preload" href="fonts/RobotoBold/RobotoBold.woff" as="font" type="font/woff" crossorigin>
+	<link rel="preload" href="fonts/RobotoRegular/RobotoRegular.woff" as="font" type="font/woff" crossorigin>
 </head>
 
 <body>
+<div class="svg-placeholder"></div>
+  <script>
+    document.querySelector('.svg-placeholder').innerHTML = SVG_SPRITE
+  </script>
 
 <div class="div">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad architecto beatae blanditiis consequatur
 	deserunt distinctio ducimus fugit harum, id ipsa maiores, nihil nobis perferendis perspiciatis quos similique tempore

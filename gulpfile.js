@@ -12,30 +12,30 @@ const gulp           = require('gulp'),
 		autoprefixer   = require('gulp-autoprefixer'),//Автопрефиксер
 		ftp            = require('vinyl-ftp'),        //Соединяемся по ftp и закидываем нужные файлы
 		notify         = require("gulp-notify"),      //Bыводит ошибки при сборке Gulp в виде системных сообщений
-		svgstore       = require('gulp-svgstore'),     //бъединяет все подключаемые SVG файлы и записывает их в HTML как <symbol> для дальнейшего использования.
-		rsync          = require('gulp-rsync');
-const gcmq = require('gulp-group-css-media-queries'); //Группирует разбросанные @media 
-const sourcemaps = require('gulp-sourcemaps');        //Показывает в отладчике реальные номера строк.
+		svgstore       = require('gulp-svgstore'),    //бъединяет все подключаемые SVG файлы и записывает их в HTML как <symbol> для дальнейшего использования.
+		rsync          = require('gulp-rsync'),
+    gcmq           = require('gulp-group-css-media-queries'), //Группирует разбросанные @media
+    sourcemaps     = require('gulp-sourcemaps'),  //Показывает в отладчике реальные номера строк.
+    cheerio = require('gulp-cheerio'),            //Очищаем SVG
+    svg2string = require('gulp-svg2string'),
+    plumber = require('gulp-plumber'),            //Bыводит ошибки при сборке Gulp в виде системных сообщений
+    sassGlob = require('gulp-sass-glob'),         //Подключает scss сразу папкой
+    cssunit = require('gulp-css-unit'),           //Из px в rem
+	babel = require('gulp-babel');
 
-
-// Пользовательские скрипты проекта
-
-gulp.task('common-js', function() {
-	return gulp.src([
-		'app/js/common.js'
-		])
-	.pipe(concat('common.min.js'))
-	.pipe(uglify())
-	.pipe(gulp.dest('app/js'));
-});
-
-gulp.task('js', ['common-js'], function() {
+gulp.task('js', function() {
 	return gulp.src([
 		// 'app/libs/jquery/dist/jquery.min.js',
-		'app/js/common.min.js' // Всегда в конце
+		'app/js/common.js'
 		])
+  .pipe(babel({
+    presets: ['@babel/env']
+  }))
+  .pipe(plumber({
+    errorHandler: notify.onError()
+  }))
 	.pipe(concat('scripts.min.js'))
-	// .pipe(uglify()) // Минимизировать весь js (на выбор)
+	.pipe(uglify())
 	.pipe(gulp.dest('app/js'))
 	.pipe(browserSync.reload({stream: true}));
 });
@@ -46,36 +46,52 @@ gulp.task('browser-sync', function() {
 			baseDir: 'app'
 		},
 		notify: false
-		// tunnel: true,
-		// tunnel: "projectmane", //Demonstration page: http://projectmane.localtunnel.me
 	});
 });
 
 gulp.task('sass', function() {
-	return gulp.src('app/sass/style.scss')
-	.pipe(sass({outputStyle: 'expand'}).on("error", notify.onError()))
+	return gulp.src('app/scss/style.scss')
+  .pipe(plumber({
+    errorHandler: notify.onError()
+  }))
+  .pipe(sassGlob())
+  .pipe(sass())
   .pipe(gcmq())
   .pipe(sourcemaps.init())
+  .pipe(autoprefixer(['last 2 versions']))
+  .pipe(cssunit({
+    type     :    'px-to-rem',
+    rootSize  :    16
+  }))
 	.pipe(gulp.dest('app/css'))
 	.pipe(rename({suffix: '.min', prefix : ''}))
-	.pipe(autoprefixer(['last 2 versions']))
-	.pipe(cleanCSS({level: 2})) // Опционально, закомментировать при отладке
+	.pipe(cleanCSS({level: 2}))
   .pipe(sourcemaps.write('.'))
 	.pipe(gulp.dest('app/css'))
 	.pipe(browserSync.reload({stream: true}));
 });
 
 gulp.task("sprite", function () {
-  return gulp.src("app/img/*-icon.svg")
-      .pipe(svgstore({
-        inlineSvg: true
-      }))
-      .pipe(rename("sprite.svg"))
-      .pipe(gulp.dest("app/img"));
+  return gulp.src('app/img/svg/*.svg')
+    .pipe(svgstore({
+      inlineSvg: true
+    }))
+    .pipe(cheerio({
+      run: function ($) {
+        $('[fill]').removeAttr('fill');
+        $('[stroke]').removeAttr('stroke');
+        $('[style]').removeAttr('style');
+      },
+      parseOptions: {
+        xmlMode: true
+      }
+    }))
+    .pipe(svg2string())
+    .pipe(gulp.dest('app/js'));
 });
 
 gulp.task('watch', ['sass', 'js', 'browser-sync'], function() {
-	gulp.watch('app/sass/**/*.scss', ['sass']);
+	gulp.watch('app/scss/**/*.scss', ['sass']);
 	gulp.watch(['libs/**/*.js', 'app/js/**/*.js'], ['js']);
 	gulp.watch('app/*.html', browserSync.reload);
 });
@@ -99,13 +115,13 @@ gulp.task('build', ['removedist', 'imagemin', 'sass', 'js'], function() {
 		]).pipe(gulp.dest('dist/css'));
 
 	let buildJs = gulp.src([
-		'app/js/scripts.min.js'
+		'app/js/scripts.min.js',
+    'app/js/svg.js'
 		]).pipe(gulp.dest('dist/js'));
 
 	let buildFonts = gulp.src([
 		'app/fonts/!**/!*'
 		]).pipe(gulp.dest('dist/fonts'));
-
 });
 
 gulp.task('deploy', function() {

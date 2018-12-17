@@ -39,4 +39,4 @@ let settings = {
   }
 };
 
-smartgrid('./src/scss', settings);
+smartgrid('./app/scss', settings);

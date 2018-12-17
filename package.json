@@ -1,36 +1,39 @@
 {
-  "name": "html-template",
+  "name": "HTML-Template",
   "version": "1.0.0",
-  "description": "HTML Template",
-  "main": "gulpfile.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "HTML Template"
-  },
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {},
   "devDependencies": {
+    "@babel/core": "latest",
+    "@babel/preset-env": "latest",
     "browser-sync": "latest",
+    "del": "latest",
     "gulp": "latest",
     "gulp-autoprefixer": "latest",
+    "gulp-babel": "latest",
     "gulp-cache": "latest",
+    "gulp-cheerio": "latest",
     "gulp-clean-css": "latest",
     "gulp-concat": "latest",
+    "gulp-css-unit": "latest",
     "gulp-group-css-media-queries": "latest",
     "gulp-imagemin": "latest",
     "gulp-notify": "latest",
+    "gulp-plumber": "latest",
+    "gulp-pretty-html": "latest",
     "gulp-rename": "latest",
     "gulp-rsync": "latest",
-    "gulp-sourcemaps": "latest",
     "gulp-sass": "latest",
+    "gulp-sass-glob": "latest",
+    "gulp-sourcemaps": "latest",
+    "gulp-svg2string": "latest",
     "gulp-svgstore": "latest",
     "gulp-uglify": "latest",
     "gulp-util": "latest",
-    "del": "latest",
-    "smart-grid": "latest",
+    "slimerjs": "latest",
+    "smart-grid": "^latest",
     "vinyl-ftp": "latest"
   },
-  "author": "Bochkarev Yuriy",
-  "license": "ISC"
+  "dependencies": {}
 }
